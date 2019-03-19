@@ -149,8 +149,9 @@ def swift_auth():
                                     )
     return swift
 
-def swift_read_image_h5(file):
+def swift_auth_read_image_h5(file):
     # https://www.getdatajoy.com/learn/Read_and_Write_HDF5_from_Python#Reading_Data_from_HDF5_Files
+    # dump imagine con autenticazione
     import numpy as np
     import h5py
     import os
@@ -166,12 +167,47 @@ def swift_read_image_h5(file):
         pass
     return image
 
-def swift_listdir(dirname):
+def swift_read_image_h5(file):
+    # dump imagine in sola lettura
+    import requests
+    import os
+    BASE_URL  = "https://swift.cloud.infn.it:8080/v1/AUTH_1e60fe39fba04701aa5ffc0b97871ed8/Cygnus/"
+
+    url = BASE_URL+file
+    r = requests.get(url)
+    tmpname = "./tmp." + str(os.getpid()) + ".h5"
+    with open(tmpname, 'wb') as tmp:
+            tmp.write(r.content)
+    image = read_image_h5(tmpname)
+    try:
+        os.remove(tmpname)
+    except OSError:
+        pass
+    return image
+
+def swift_auth_listdir(dirname):
     swift = swift_auth()
     fileindir=[]
     for data in swift.get_container("Cygnus", full_listing=True)[1]:
         if dirname in str(data):
             fileindir.append(data['name'])
+    return fileindir
+
+def swift_listdir(dirname):
+    import requests
+    BASE_URL  = "https://swift.cloud.infn.it:8080/v1/AUTH_1e60fe39fba04701aa5ffc0b97871ed8/Cygnus/"
+    r = requests.get(BASE_URL)
+    #print(r.status_code)
+    #print(r.headers)
+    #    print(r.content)
+    r = r.content
+    string = r.decode("ISO-8859-1")
+    dati = string.split('\n')
+    #print (dati)
+    fileindir=[]
+    for data in dati:
+        if dirname in data:
+            fileindir.append(data)
     return fileindir
 
 
@@ -452,7 +488,8 @@ def set_atlas_style(shape="medium"):
     plt.rcParams["figure.subplot.right"] = 0.95
 
     # Set font options
-    plt.rcParams["font.family"] = "sans-serif"
+    #plt.rcParams["font.family"] = "sans-serif"
+    plt.rcParams["font.family"] = "DejaVu Sans"
     plt.rcParams["font.sans-serif"] = "Helvetica, helvetica, Nimbus Sans L, Mukti Narrow, FreeSans"  # alternatives if helvetica is unavailable
     plt.rcParams["font.cursive"] = "Apple Chancery, Textile, Zapf Chancery, Sand, Script MT, Felipa, cursive, Helvetica, helvetica"
     plt.rcParams["mathtext.fontset"] = "custom"
