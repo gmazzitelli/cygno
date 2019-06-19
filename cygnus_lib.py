@@ -114,16 +114,14 @@ def swift_auth():
     from keystoneauth1.identity import v3
 
     
-    OS_REGION_NAME='lnf'
-    OS_USER_DOMAIN_NAME='default'
-    OS_PROJECT_DOMAIN_NAME='default'
-    OS_PROJECT_NAME='cygnus-default'
-    OS_IDENTITY_API_VERSION='3'
-    OS_PASSWORD='bayRonPeOcan9Quiufvecfevesyailb7'
-    OS_AUTH_TYPE='password'
-    OS_AUTH_STRATEGY='keystone'
+    OS_PROJECT_NAME='anonymous'
+    OS_USERNAME='anonymous'
+    OS_PASSWORD='anonymous'
     OS_AUTH_URL='https://keystone.cloud.infn.it:5000/v3/'
-    OS_USERNAME='cygnus'
+    OS_REGION_NAME='lnf'
+    OS_PROJECT_DOMAIN_NAME='default'
+    OS_USER_DOMAIN_NAME='default'
+    OS_IDENTITY_API_VERSION='3'
     OS_STORAGE_URL='https://swift.cloud.infn.it:8080/v1/AUTH_1e60fe39fba04701aa5ffc0b97871ed8'
 
 
@@ -185,7 +183,7 @@ def swift_read_image_h5(file):
         pass
     return image
 
-def swift_auth_listdir(dirname):
+def swift_listdir(dirname):
     swift = swift_auth()
     fileindir=[]
     for data in swift.get_container("Cygnus", full_listing=True)[1]:
@@ -193,17 +191,15 @@ def swift_auth_listdir(dirname):
             fileindir.append(data['name'])
     return fileindir
 
-def swift_listdir(dirname):
+def swift_noauth_listdir(dirname):
     import requests
     BASE_URL  = "https://swift.cloud.infn.it:8080/v1/AUTH_1e60fe39fba04701aa5ffc0b97871ed8/Cygnus/"
     r = requests.get(BASE_URL)
-    #print(r.status_code)
-    #print(r.headers)
-    #    print(r.content)
+
     r = r.content
     string = r.decode("ISO-8859-1")
     dati = string.split('\n')
-    #print (dati)
+
     fileindir=[]
     for data in dati:
         if dirname in data:
