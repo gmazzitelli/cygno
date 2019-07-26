@@ -514,7 +514,7 @@ def set_atlas_style(shape="medium"):
 
     # Set legend options
     plt.rcParams["legend.numpoints"] = 1
-    plt.rcParams["legend.fontsize"] = 19
+    plt.rcParams["legend.fontsize"] = 22 #19
     plt.rcParams["legend.labelspacing"] = 0.3
     plt.rcParams["legend.frameon"] = True
     
