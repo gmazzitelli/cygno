@@ -265,6 +265,45 @@ def UnderTh2Array(ArrayIn, Th):
             ThArr.append([i, ArrayIn[i], UnderTh])
     return  ThArr
 
+def swift_root_file(sel, run):
+    BASE_URL  = "https://swift.cloud.infn.it:8080/v1/AUTH_1e60fe39fba04701aa5ffc0b97871ed8/Cygnus/"
+    file_root = ('Data/'+sel+'/histograms_Run%05d.root' % run)
+    return BASE_URL+file_root
+
+def reporthook(blocknum, blocksize, totalsize):
+    import sys
+    readsofar = blocknum * blocksize
+    if totalsize > 0:
+        percent = readsofar * 1e2 / totalsize
+        s = "\r%5.1f%% %*d / %d" % (
+            percent, len(str(totalsize)), readsofar, totalsize)
+        sys.stderr.write(s)
+        if readsofar >= totalsize: # near the end
+            sys.stderr.write("\n")
+    else: # total size is unknown
+        sys.stderr.write("read %d\n" % (readsofar,))
+        
+def swift_read_root_file(url):
+    import ROOT
+    import os
+    from urllib.request import urlretrieve
+    tmpname = "./tmp." + str(os.getpid()) + ".root"
+    urlretrieve(url, tmpname, reporthook)
+    f  = ROOT.TFile.Open(tmpname);
+    os.remove(tmpname)
+    return f   
+
+def root_TH2_name(root_file):
+    pic = []
+    wfm = []
+    for i,e in enumerate(root_file.GetListOfKeys()):
+        che = e.GetName()
+        if ('pic_run' in str(che)):
+            pic.append(che)
+        elif ('wfm_run' in str(che)):
+            wfm.append(che)
+    return pic, wfm
+
 # ############################################################################################################################ #
 # Clustering
 # ############################################################################################################################ #
