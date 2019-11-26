@@ -293,6 +293,18 @@ def swift_read_root_file(url):
     os.remove(tmpname)
     return f   
 
+def swift_download_file(url):
+    import os
+    from urllib.request import urlretrieve
+    tmpname = "./tmp." + str(os.getpid()) + ".root"
+    urlretrieve(url, tmpname, reporthook)
+    return tmpname
+
+
+def rm_file(filein):
+    command = '/bin/rm ' + filein
+    return os.system(command)
+
 def root_TH2_name(root_file):
     pic = []
     wfm = []
@@ -303,6 +315,119 @@ def root_TH2_name(root_file):
         elif ('wfm_run' in str(che)):
             wfm.append(che)
     return pic, wfm
+
+
+
+def confidence_ellipse_par(x, y):
+    import numpy as np
+    if x.size != y.size:
+        raise ValueError("x and y must be the same size")
+
+    cov = np.cov(x, y)
+
+    if np.sqrt(cov[0, 0] * cov[1, 1]) == 0:
+        width = height = -1
+        pearson = np.nan
+    else:
+        pearson = cov[0, 1]/np.sqrt(cov[0, 0] * cov[1, 1])
+        # Using a special case to obtain the eigenvalues of this
+        # two-dimensionl dataset.
+
+        ell_radius_x = np.sqrt(1 + pearson)
+        ell_radius_y = np.sqrt(1 - pearson)
+        width=ell_radius_x * 2
+        height=ell_radius_y * 2
+    return width, height, pearson
+
+def cluster_par(xc, yc, image):
+    ph = 0.
+    dim = xc.shape[0]
+    for j in range(0, dim):
+        x = int(xc[j])
+        y = int(yc[j])
+        ph += (image[y,x])
+    return ph, dim
+
+def confidence_ellipse(x, y, ax, n_std=3.0, facecolor='none', **kwargs):
+    from matplotlib.patches import Ellipse
+    import matplotlib.transforms as transforms
+    import numpy as np
+    """
+    Create a plot of the covariance confidence ellipse of `x` and `y`
+
+    Parameters
+    ----------
+    x, y : array_like, shape (n, )
+        Input data.
+
+    ax : matplotlib.axes.Axes
+        The axes object to draw the ellipse into.
+
+    n_std : float
+        The number of standard deviations to determine the ellipse's radiuses.
+
+    Returns
+    -------
+    matplotlib.patches.Ellipse
+
+    Other parameters
+    ----------------
+    kwargs : `~matplotlib.patches.Patch` properties
+    """
+    if x.size != y.size:
+        raise ValueError("x and y must be the same size")
+
+    cov = np.cov(x, y)
+    pearson = cov[0, 1]/np.sqrt(cov[0, 0] * cov[1, 1])
+    # Using a special case to obtain the eigenvalues of this
+    # two-dimensionl dataset.
+    ell_radius_x = np.sqrt(1 + pearson)
+    ell_radius_y = np.sqrt(1 - pearson)
+    ellipse = Ellipse((0, 0),
+        width=ell_radius_x * 2,
+        height=ell_radius_y * 2,
+        facecolor=facecolor,
+        **kwargs)
+
+    # Calculating the stdandard deviation of x from
+    # the squareroot of the variance and multiplying
+    # with the given number of standard deviations.
+    scale_x = np.sqrt(cov[0, 0]) * n_std
+    mean_x = np.mean(x)
+
+    # calculating the stdandard deviation of y ...
+    scale_y = np.sqrt(cov[1, 1]) * n_std
+    mean_y = np.mean(y)
+
+    transf = transforms.Affine2D() \
+        .rotate_deg(45) \
+        .scale(scale_x, scale_y) \
+        .translate(mean_x, mean_y)
+
+    ellipse.set_transform(transf + ax.transData)
+    #print (ellipse, transf)
+    return ax.add_patch(ellipse), ellipse
+
+
+def cluster_elips(points):
+    import numpy as np
+    x0i= np.argmin(points[:,1])
+    a0 = points[x0i][1]
+    x1i= np.argmax(points[:,1])
+    a1 = points[x1i][1]
+    y0i= np.argmin(points[:,0])
+    b0 = points[y0i][0]
+    y1i= np.argmax(points[:,0])
+    b1 = points[y1i][0]
+    #print (a0, a1, b0, b1, x0i, points[x0i])
+    a  = (a1 - a0)/2.
+    b  = (b1 - b0)/2.
+    x0 = (a1 + a0)/2.
+    y0 = (b1 + b0)/2.
+    theta = np.arctan((points[x1i][0]-points[x0i][0])/(points[x1i][1]-points[x0i][1]))
+    return x0, y0, a , b, theta
+
+
 
 # ############################################################################################################################ #
 # Clustering
