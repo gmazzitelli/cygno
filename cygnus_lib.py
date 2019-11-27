@@ -270,6 +270,11 @@ def swift_root_file(sel, run):
     file_root = ('Data/'+sel+'/histograms_Run%05d.root' % run)
     return BASE_URL+file_root
 
+def swift_fileByname(sel, filename):
+    BASE_URL  = "https://swift.cloud.infn.it:8080/v1/AUTH_1e60fe39fba04701aa5ffc0b97871ed8/Cygnus/"
+    file_tif = ('Data/'+sel+'/'+filename)
+    return BASE_URL+file_tif
+
 def reporthook(blocknum, blocksize, totalsize):
     import sys
     readsofar = blocknum * blocksize
