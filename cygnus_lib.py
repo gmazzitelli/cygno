@@ -291,26 +291,29 @@ def reporthook(blocknum, blocksize, totalsize):
 def swift_read_root_file(url):
     import ROOT
     import os
-    f#rom urllib.request import urlretrieve
-    try:
-        from urllib.request import urlretrieve
-    except ImportError:
-        from urllib2 import urlretrieve
+    import urllib
+    from platform import python_version
+    #from urllib.request import urlretrieve
     tmpname = "./tmp." + str(os.getpid()) + ".root"
-    urlretrieve(url, tmpname, reporthook)
+
+    if python_version().split('.')[0]=='3':
+        urllib.request.urlretrieve(url, tmpname, reporthook)
+    else:
+        urllib.urlretrieve(url, tmpname, reporthook)
     f  = ROOT.TFile.Open(tmpname);
     os.remove(tmpname)
     return f   
 
 def swift_download_file(url):
     import os
+    import urllib
+    from platform import python_version
     #from urllib.request import urlretrieve
-    try:
-        from urllib.request import urlretrieve
-    except ImportError:
-        from urllib2 import urlretrieve
     tmpname = "./tmp." + str(os.getpid()) + ".root"
-    urlretrieve(url, tmpname, reporthook)
+    if python_version().split('.')[0]=='3':
+        urllib.request.urlretrieve(url, tmpname, reporthook)
+    else:
+        urllib.urlretrieve(url, tmpname, reporthook)
     return tmpname
 
 
