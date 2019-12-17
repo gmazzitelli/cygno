@@ -293,13 +293,14 @@ def swift_read_root_file(url):
     import os
     import urllib
     from platform import python_version
-    #from urllib.request import urlretrieve
+    
     tmpname = "./tmp." + str(os.getpid()) + ".root"
-
+    
     if python_version().split('.')[0]=='3':
         urllib.request.urlretrieve(url, tmpname, reporthook)
     else:
         urllib.urlretrieve(url, tmpname, reporthook)
+
     f  = ROOT.TFile.Open(tmpname);
     os.remove(tmpname)
     return f   
@@ -308,12 +309,14 @@ def swift_download_file(url):
     import os
     import urllib
     from platform import python_version
-    #from urllib.request import urlretrieve
+    
     tmpname = "./tmp." + str(os.getpid()) + ".root"
+    
     if python_version().split('.')[0]=='3':
         urllib.request.urlretrieve(url, tmpname, reporthook)
     else:
         urllib.urlretrieve(url, tmpname, reporthook)
+        
     return tmpname
 
 
