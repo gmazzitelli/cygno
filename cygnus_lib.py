@@ -188,7 +188,8 @@ def swift_listdir(dirname):
     fileindir=[]
     for data in swift.get_container("Cygnus", full_listing=True)[1]:
         if dirname in str(data):
-            fileindir.append(data['name'])
+            if data['name'].find("._") <= 0 : # Petch aggiunta per i cazzo di file mac...
+                fileindir.append(data['name'])
     return fileindir
 
 def swift_noauth_listdir(dirname):
