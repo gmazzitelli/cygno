@@ -118,7 +118,7 @@ def swift_auth():
     OS_USERNAME='anonymous'
     OS_PASSWORD='anonymous'
     OS_AUTH_URL='https://keystone.cloud.infn.it:5000/v3/'
-    OS_REGION_NAME='lnf'
+    OS_REGION_NAME='canf'
     OS_PROJECT_DOMAIN_NAME='default'
     OS_USER_DOMAIN_NAME='default'
     OS_IDENTITY_API_VERSION='3'
