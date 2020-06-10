@@ -714,9 +714,9 @@ def set_atlas_style(shape="medium"):
 mockNDarray makes a lists of ndarrays (or lists)
             immitate an ndarray (without data copy)
 """
-from __future__ import absolute_import
-__author__  = "Sebastian Haase <seb.haase@gmail.com>"
-__license__ = "BSD license - see LICENSE file"
+# from __future__ import absolute_import
+# __author__  = "Sebastian Haase <seb.haase@gmail.com>"
+# __license__ = "BSD license - see LICENSE file"
 
 import numpy as np
 
